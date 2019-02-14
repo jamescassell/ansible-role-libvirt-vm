@@ -80,6 +80,7 @@ libvirt_vm_kickstart_content: |
   %end
   %addon com_redhat_kdump --disable --reserve-mb='auto'
   %end
+  reboot
 
 
 libvirt_vm_instance_ip: "{{ libvirt_vm_ip_query.stdout | ipaddr('address') }}"
