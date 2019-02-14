@@ -13,11 +13,11 @@
   when: libvirt_vm_inject_kickstart
 
 - name: install VM from scratch
-  command: virt-install --noautoconsole
+  command: virt-install
       --connect {{ libvirt_vm_uri }}
       --virt-type kvm
       --name {{ libvirt_vm_name | quote }}
-      {% if libvirt_vm_install_only %}--noreboot {% endif -%}
+      {% if libvirt_vm_install_only %}--noreboot --noautoconsole {% endif -%}
       {% if not libvirt_vm_enable_graphics %}--graphics none {% endif -%}
       --vcpus {{ libvirt_vm_cpus }}
       --memory {{ libvirt_vm_memory }}
@@ -28,6 +28,8 @@
       {% if libvirt_vm_inject_kickstart %}--initrd-inject {{ libvirt_vm_tempfile.path }} {% endif -%}
       --extra-args {{ libvirt_vm_cmdline | quote }}
       {{ libvirt_vm_libvirt_extra_args }}
+  async: 600
+  poll: 0
   # args:
   #   stdin: "{{ libvirt_vm_inject_kickstart | ternary(libvirt_vm_kickstart_content, omit) }}"
 
