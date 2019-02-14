@@ -21,5 +21,7 @@
       tail -n +3 | head -n -1 | awk '{print $5}'
   changed_when: no
   register: libvirt_vm_ip_query
+  until: libvirt_vm_ip_query.stdout != ""
+  retries: 30
 
 - debug: var=libvirt_vm_instance_ip
