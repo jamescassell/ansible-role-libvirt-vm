@@ -1,0 +1,25 @@
+---
+# tasks file for libvirt-vm
+
+- name: verify VM existance
+  virt:
+    command: list_vms
+    uri: "{{ libvirt_vm_uri }}"
+  register: libvirt_vm_list
+  changed_when: libvirt_vm_name not in libvirt_vm_list.list_vms
+
+- name: create VM
+  include_tasks: virt-install.yml
+  when: libvirt_vm_list is changed
+
+- name: get VM IP
+  shell: virsh --connect {{ libvirt_vm_uri }} net-dhcp-leases
+      --network $(virsh --connect {{ libvirt_vm_uri }} dumpxml {{ libvirt_vm_name }} |
+        xmllint --xpath 'string(/domain/devices/interface/source/@network)' - )
+      --mac $(virsh --connect {{ libvirt_vm_uri }}  dumpxml {{ libvirt_vm_name }} |
+        xmllint --xpath 'string(/domain/devices/interface/mac/@address)' - ) |
+      tail -n +3 | head -n -1 | awk '{print $5}'
+  changed_when: no
+  register: libvirt_vm_ip_query
+
+- debug: var=libvirt_vm_instance_ip

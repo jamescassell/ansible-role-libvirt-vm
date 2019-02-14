@@ -1,0 +1,38 @@
+---
+# virt-install tasks file for libvirt-vm
+
+- name: create tempfile for ks
+  tempfile:
+  register: libvirt_vm_tempfile
+  when: libvirt_vm_inject_kickstart
+
+- name: place kickstart
+  copy:
+    dest: "{{ libvirt_vm_tempfile.path }}"
+    content: "{{ libvirt_vm_kickstart_content }}"
+  when: libvirt_vm_inject_kickstart
+
+- name: install VM from scratch
+  command: virt-install --noautoconsole
+      --connect {{ libvirt_vm_uri }}
+      --virt-type kvm
+      --name {{ libvirt_vm_name | quote }}
+      {% if libvirt_vm_install_only %}--noreboot {% endif -%}
+      {% if not libvirt_vm_enable_graphics %}--graphics none {% endif -%}
+      --vcpus {{ libvirt_vm_cpus }}
+      --memory {{ libvirt_vm_memory }}
+      --disk size={{ libvirt_vm_disk_size }}
+      {% if libvirt_vm_enable_disk_overcommit %}--check disk_size=off {% endif -%}
+      --location {{ libvirt_vm_installer_location }}
+      {% if libvirt_vm_os_variant != omit %}--os-variant {{ libvirt_vm_os_variant }} {% endif -%}
+      {% if libvirt_vm_inject_kickstart %}--initrd-inject {{ libvirt_vm_tempfile.path }} {% endif -%}
+      --extra-args {{ libvirt_vm_cmdline | quote }}
+      {{ libvirt_vm_libvirt_extra_args }}
+  # args:
+  #   stdin: "{{ libvirt_vm_inject_kickstart | ternary(libvirt_vm_kickstart_content, omit) }}"
+
+- name: remove tempfile
+  file:
+    path: "{{ libvirt_vm_tempfile.path }}"
+    state: absent
+  when: libvirt_vm_inject_kickstart

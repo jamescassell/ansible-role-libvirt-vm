@@ -1,0 +1,85 @@
+---
+# defaults file for libvirt-vm
+
+libvirt_vm_name: "{{ inventory_hostname }}"
+libvirt_vm_installer_location: "{{ libvirt_vm_mirror_url }}{{ libvirt_vm_rhsm_baseurl }}{{ libvirt_vm_installer_path }}"
+libvirt_vm_inject_kickstart: yes
+
+# local content mirror
+libvirt_vm_mirror_url: ""
+
+# baseurl of master mirror (RHEL example shown in comments)
+# libvirt_vm_rhsm_baseurl: https://cdn.redhat.com
+libvirt_vm_rhsm_baseurl: http://mirror.centos.org
+
+# libvirt_vm_installer_path: /content/dist/rhel/server/7/7.6/x86_64/kickstart
+libvirt_vm_installer_path: /centos/7.6.1810/os/x86_64
+
+# extra args to pass to the installer at boot on the kernel command line
+libvirt_vm_cmdline_extra_args: ""
+
+libvirt_vm_os_variant: "{{ omit }}"  # get valid values from 'osinfo-query os'
+
+libvirt_vm_cpus: 2
+libvirt_vm_memory: 2048
+libvirt_vm_disk_size: 10
+
+libvirt_vm_install_only: no
+
+
+libvirt_vm_uri: qemu:///system
+libvirt_vm_libvirt_extra_args: ""
+
+libvirt_vm_enable_disk_overcommit: no
+libvirt_vm_enable_graphics: yes
+libvirt_vm_enable_serial: yes
+
+# enable SSH to the VM during kickstart
+libvirt_vm_enable_ssh: no
+
+
+libvirt_vm_cmdline: "{{ libvirt_vm_cmdline_default }}"
+libvirt_vm_cmdline_default: >-
+  net.ifnames=0 inst.geoloc=0
+  {% if libvirt_vm_inject_kickstart %}inst.ks=file:///{{ libvirt_vm_tempfile.path | basename }} {% endif -%}
+  inst.repo={{ libvirt_vm_installer_location }}
+  {% if libvirt_vm_enable_serial %}console=tty0 console=ttyS0,115200n8 {% endif -%}
+  {{ libvirt_vm_enable_ssh | ternary('inst.sshd', '') }}
+  {{ libvirt_vm_cmdline_extra_args }}
+
+
+libvirt_vm_kickstart_content: |
+  # commented items demo a micro install
+  #ignoredisk --only-use=vda
+  keyboard --vckeymap=us --xlayouts='us'
+  lang en_US.UTF-8
+  rootpw --iscrypted !!
+  timezone America/New_York --isUtc
+  bootloader
+  #bootloader --disabled
+  autopart
+  #autopart --type=plain --fstype=ext4
+  clearpart --none --initlabel
+  %packages --nocore
+  #-chrony
+  #-e2fsprogs
+  #-kernel
+  #-qemu-guest-agent no effect due to anaconda bug
+  -authconfig
+  dhclient
+  # uncomment for fips mode on Sandy Bridge or newer
+  #dracut-fips-aesni
+  firewalld
+  libselinux-python
+  openssh-server
+  passwd
+  rootfiles
+  selinux-policy-targeted
+  sudo
+  yum
+  %end
+  %addon com_redhat_kdump --disable --reserve-mb='auto'
+  %end
+
+
+libvirt_vm_instance_ip: "{{ libvirt_vm_ip_query.stdout | ipaddr('address') }}"
