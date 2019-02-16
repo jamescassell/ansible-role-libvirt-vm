@@ -30,6 +30,8 @@
       {{ libvirt_vm_libvirt_extra_args }}
   async: 600
   poll: 0
+  register: libvirt_vm_virt_install_async
+  notify: clean up async virt-install
   # args:
   #   stdin: "{{ libvirt_vm_inject_kickstart | ternary(libvirt_vm_kickstart_content, omit) }}"
 
@@ -39,7 +41,7 @@
 
 - name: catch early virt-install failure
   async_status:
-    jid: "{{ libvirt_vm_virt_install_result.ansible_job_id }}"
+    jid: "{{ libvirt_vm_virt_install_async.ansible_job_id }}"
 
 - name: remove tempfile
   file:

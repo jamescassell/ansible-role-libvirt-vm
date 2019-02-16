@@ -1,0 +1,16 @@
+---
+# handlers file for libvirt-vm
+
+- name: wait for virt-install to finish
+  listen: clean up async virt-install
+  async_status:
+    jid: "{{ libvirt_vm_virt_install_async.ansible_job_id }}"
+  register: libvirt_vm_job_result
+  until: libvirt_vm_job_result is finished
+  retries: 30
+  delay: 15
+
+- name: clean up async virt-install
+  async_status:
+    jid: "{{ libvirt_vm_virt_install_async.ansible_job_id }}"
+    mode: cleanup
