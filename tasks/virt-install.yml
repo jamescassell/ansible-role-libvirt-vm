@@ -33,6 +33,14 @@
   # args:
   #   stdin: "{{ libvirt_vm_inject_kickstart | ternary(libvirt_vm_kickstart_content, omit) }}"
 
+- name: give virt-install a few seconds to fail
+  wait_for:
+    timeout: 5
+
+- name: catch early virt-install failure
+  async_status:
+    jid: "{{ libvirt_vm_virt_install_result.ansible_job_id }}"
+
 - name: remove tempfile
   file:
     path: "{{ libvirt_vm_tempfile.path }}"
