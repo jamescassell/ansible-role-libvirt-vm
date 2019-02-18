@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  author: James Cassell
+  description: Create a libvirt VM using virt-install.
+  # company: your company (optional)
+
+  license: Apache-2.0 or MIT or BSD-3-Clause
+
+  min_ansible_version: 2.4
+
+  platforms:
+  - name: EL
+    versions:
+    - 7
+  - name: Fedora
+    versions:
+    - all
+
+  galaxy_tags:
+  - provisioning
+  - virtualization
+
+dependencies: []
