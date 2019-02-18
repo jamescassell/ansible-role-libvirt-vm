@@ -34,6 +34,9 @@ libvirt_vm_enable_disk_overcommit: no
 libvirt_vm_enable_graphics: yes
 libvirt_vm_enable_serial: yes
 
+# expose raw host cpu to guest
+libvirt_vm_enable_nested_virt: no
+
 # enable SSH to the VM during kickstart
 libvirt_vm_enable_ssh: no
 
