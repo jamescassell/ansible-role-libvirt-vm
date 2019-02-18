@@ -20,7 +20,7 @@ libvirt_vm_cmdline_extra_args: ""
 
 libvirt_vm_os_variant: "{{ omit }}"  # get valid values from 'osinfo-query os'
 
-libvirt_vm_cpus: 2
+libvirt_vm_cpu_cores: 2
 libvirt_vm_memory: 1280
 libvirt_vm_disk_size: 8
 

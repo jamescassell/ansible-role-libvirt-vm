@@ -20,7 +20,7 @@
       --name {{ libvirt_vm_name | quote }}
       {% if libvirt_vm_install_only %}--noreboot --noautoconsole {% endif -%}
       {% if not libvirt_vm_enable_graphics %}--graphics none {% endif -%}
-      --vcpus {{ libvirt_vm_cpus }}
+      --vcpus {{ libvirt_vm_cpu_cores }}
       --memory {{ libvirt_vm_memory }}
       --disk size={{ libvirt_vm_disk_size }}
       {% if libvirt_vm_enable_disk_overcommit %}--check disk_size=off {% endif -%}
