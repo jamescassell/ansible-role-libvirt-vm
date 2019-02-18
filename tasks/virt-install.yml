@@ -5,6 +5,7 @@
   tempfile:
   register: libvirt_vm_tempfile
   when: libvirt_vm_inject_kickstart
+  notify: remove tempfile
 
 - name: place kickstart
   copy:
@@ -42,9 +43,3 @@
 - name: catch early virt-install failure
   async_status:
     jid: "{{ libvirt_vm_virt_install_async.ansible_job_id }}"
-
-- name: remove tempfile
-  file:
-    path: "{{ libvirt_vm_tempfile.path }}"
-    state: absent
-  when: libvirt_vm_inject_kickstart
