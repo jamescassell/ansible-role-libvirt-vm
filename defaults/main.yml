@@ -2,15 +2,15 @@
 # defaults file for libvirt-vm
 
 libvirt_vm_name: "{{ inventory_hostname }}"
-libvirt_vm_installer_location: "{{ libvirt_vm_mirror_url }}{{ libvirt_vm_rhsm_baseurl }}{{ libvirt_vm_installer_path }}"
+libvirt_vm_installer_location: "{{ libvirt_vm_mirror_url }}{{ libvirt_vm_installer_baseurl }}{{ libvirt_vm_installer_path }}"
 libvirt_vm_inject_kickstart: yes
 
 # local content mirror
 libvirt_vm_mirror_url: ""
 
-# baseurl of master mirror (RHEL example shown in comments)
-# libvirt_vm_rhsm_baseurl: https://cdn.redhat.com
-libvirt_vm_rhsm_baseurl: http://mirror.centos.org
+# baseurl of master mirror (rhsm.baseurl for RHEL; example shown in comments)
+#libvirt_vm_installer_baseurl: https://cdn.redhat.com
+libvirt_vm_installer_baseurl: http://mirror.centos.org
 
 # libvirt_vm_installer_path: /content/dist/rhel/server/7/7.6/x86_64/kickstart
 libvirt_vm_installer_path: /centos/7.6.1810/os/x86_64
