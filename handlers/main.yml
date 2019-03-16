@@ -4,19 +4,31 @@
 - name: wait for virt-install to finish
   listen: clean up async virt-install
   async_status:
-    jid: "{{ libvirt_vm_virt_install_async.ansible_job_id }}"
+    jid: "{{ item.ansible_job_id }}"
   register: libvirt_vm_job_result
   until: libvirt_vm_job_result is finished
   retries: 30
   delay: 15
+  with_items: "{{ libvirt_vm_virt_install_async_items }}"
 
 - name: clean up async virt-install
   async_status:
-    jid: "{{ libvirt_vm_virt_install_async.ansible_job_id }}"
+    jid: "{{ item.ansible_job_id }}"
     mode: cleanup
+  with_items: "{{ libvirt_vm_virt_install_async_items }}"
+
+- name: mark virt-install cleanup complete
+  listen: clean up async virt-install
+  set_fact:
+    libvirt_vm_virt_install_async_items: []
 
 - name: remove tempfile
   file:
-    path: "{{ libvirt_vm_tempfile.path }}"
+    path: "{{ item.path }}"
     state: absent
-  when: libvirt_vm_inject_kickstart
+  with_items: "{{ libvirt_vm_tempfile_items }}"
+
+- name: mark tempfile cleanup complete
+  listen: remove tempfile
+  set_fact:
+    libvirt_vm_tempfile_items: []

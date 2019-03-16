@@ -7,6 +7,12 @@
   when: libvirt_vm_inject_kickstart
   notify: remove tempfile
 
+- name: keep track of resources for cleanup
+  set_fact:
+    libvirt_vm_tempfile_items: "{{ libvirt_vm_tempfile_items | default([]) +
+        [libvirt_vm_tempfile] }}"
+  when: libvirt_vm_tempfile is not skipped
+
 - name: place kickstart
   copy:
     dest: "{{ libvirt_vm_tempfile.path }}"
@@ -36,6 +42,13 @@
   notify: clean up async virt-install
   # args:
   #   stdin: "{{ libvirt_vm_inject_kickstart | ternary(libvirt_vm_kickstart_content, omit) }}"
+
+- name: keep track of resources for cleanup
+  set_fact:
+    libvirt_vm_virt_install_async_items: "{{ libvirt_vm_virt_install_async_items | default([]) +
+        [libvirt_vm_virt_install_async] }}"
+  when: libvirt_vm_virt_install_async is not skipped
+
 
 - name: give virt-install a few seconds to fail
   wait_for:
